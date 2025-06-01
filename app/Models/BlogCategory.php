@@ -2,26 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Додаємо цей рядок
+use Illuminate\Database\Eloquent\Factories\HasFactory; // <-- Переконайтеся, що цей рядок є
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // Додаємо для softDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class BlogPost extends Model
+class BlogCategory extends Model
 {
-    use HasFactory; // Додаємо сюди
-    use SoftDeletes; // Додаємо сюди для softDeletes
+    use SoftDeletes;
+    use HasFactory; // <-- Переконайтеся, що цей рядок є
 
-    // Якщо ви хочете дозволити масове присвоєння для цих полів,
-    // додайте їх у властивість $fillable:
-    protected $fillable = [
-        'category_id',
-        'user_id',
-        'slug',
-        'title',
-        'excerpt',
-        'content_raw',
-        'content_html',
-        'is_published',
-        'published_at',
-    ];
+    protected $fillable // Дозволені для масового призначення атрибути
+        = [
+            'title',
+            'slug',
+            'parent_id',
+            'description',
+        ];
+
+    /**
+     * Get the parent category that owns the BlogCategory.
+     *
+     * Додаємо метод для батьківської категорії
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parentCategory()
+    {
+        return $this->belongsTo(BlogCategory::class, 'parent_id');
+    }
+
+    /**
+     * Додаємо аксессор для отримання заголовка з відступом для дочірніх категорій
+     * @return string
+     */
+    public function getParentTitleAttribute()
+    {
+        $parent = $this->parentCategory;
+
+        return $parent ? $parent->title : 'Коренева';
+    }
 }
