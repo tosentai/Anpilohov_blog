@@ -2,16 +2,14 @@
 
 namespace App\Models;
 
-// Обов'язково додайте цей рядок для HasFactory
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // <<-- ЦЕЙ РЯДОК
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // Переконайтеся, що цей рядок також є, якщо ви його додавали
+use Illuminate\Database\Eloquent\SoftDeletes; // Цей рядок також має бути, якщо ви його додавали
 
 class BlogPost extends Model
 {
-    // Обов'язково додайте цей рядок для використання HasFactory
-    use HasFactory;
-    use SoftDeletes; // Якщо ви використовуєте SoftDeletes, цей рядок теж повинен бути
+    use HasFactory; // <<-- І ЦЕЙ РЯДОК
+    use SoftDeletes; // І цей рядок, якщо ви його додавали
 
     /**
      * The attributes that are mass assignable.
