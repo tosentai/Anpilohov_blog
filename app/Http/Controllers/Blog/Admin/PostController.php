@@ -7,7 +7,6 @@ use App\Http\Controllers\Blog\Admin\BaseController;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository; // Додайте цей рядок
 use App\Http\Requests\BlogPostUpdateRequest; // Додайте цей рядок
-use Carbon\Carbon; // Додайте цей рядок
 use Illuminate\Support\Str; // Додайте цей рядок
 
 class PostController extends BaseController // Замініть Controller на BaseController
@@ -88,19 +87,6 @@ class PostController extends BaseController // Замініть Controller на 
         }
 
         $data = $request->validated(); // Отримуємо валідовані дані
-
-        // Обробка slug
-        if (empty($data['slug'])) { // якщо псевдонім порожній
-            $data['slug'] = Str::slug($data['title']); // генеруємо псевдонім з заголовка
-        }
-
-        // Обробка is_published та published_at
-        // Якщо стаття публікується вперше (published_at порожнє) і is_published прийшло як true
-        if (empty($item->published_at) && $data['is_published']) {
-            $data['published_at'] = Carbon::now(); // генеруємо поточну дату
-        } else if (!$data['is_published']) { // Якщо знімаємо публікацію
-            $data['published_at'] = null;
-        }
 
         // Встановлюємо user_id, якщо він не встановлений (для нових статей)
         // Для оновлення, user_id вже має бути встановлений, але можна додати перевірку
