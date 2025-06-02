@@ -33,17 +33,17 @@ Route::group([
 $groupData = [
     // 'namespace' => 'App\Http\Controllers\Blog\Admin', // Цей рядок має бути закоментований або видалений
     'prefix' => 'admin/blog',
-    'as' => 'blog.admin.', // <--- ЦЕЙ ПРЕФІКС ДЛЯ ІМЕН МАРШРУТІВ
+    'as' => 'blog.admin.',
 ];
 Route::group($groupData, function () {
     // BlogCategory
     $methods = ['index','edit','store','update','create',];
     Route::resource('categories', CategoryController::class)
         ->only($methods)
-        ->names('categories'); // <--- ЗМІНІТЬ ТУТ: ПРОСТО 'categories'
+        ->names('categories');
 
     // BlogPost (Статті блогу для адмінки)
     Route::resource('posts', AdminPostController::class)
         ->except(['show'])
-        ->names('posts'); // <--- ЗМІНІТЬ ТУТ: ПРОСТО 'posts'
+        ->names('posts');
 });

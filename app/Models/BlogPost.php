@@ -2,31 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // <<-- ЦЕЙ РЯДОК
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // Цей рядок також має бути, якщо ви його додавали
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BlogPost extends Model
 {
-    use HasFactory; // <<-- І ЦЕЙ РЯДОК
-    use SoftDeletes; // І цей рядок, якщо ви його додавали
+    use SoftDeletes;
+    use HasFactory;
+
+    protected $fillable
+        = [
+            'title',
+            'slug',
+            'category_id',
+            'excerpt',
+            'content_raw',
+            'is_published',
+            'published_at',
+            'user_id',
+        ];
 
     /**
-     * The attributes that are mass assignable.
+     * Категорія статті
      *
-     * @var array<int, string>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    protected $fillable = [
-        'category_id',
-        'user_id',
-        'slug',
-        'title',
-        'excerpt',
-        'content_raw',
-        'content_html',
-        'is_published',
-        'published_at',
-    ];
+    public function category()
+    {
+        return $this->belongsTo(BlogCategory::class);
+    }
 
-    // ... інший код моделі, якщо є
+    /**
+     * Автор статті
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

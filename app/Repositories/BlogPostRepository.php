@@ -20,7 +20,6 @@ class BlogPostRepository extends CoreRepository
      */
     protected function getModelClass(): string
     {
-        // Абстрагуємо модель BlogPost
         return Model::class;
     }
 
@@ -46,8 +45,14 @@ class BlogPostRepository extends CoreRepository
 
         $result = $this->startConditions()
             ->select($columns)
-            ->orderBy('id', 'DESC') // Сортуємо за ID у спадному порядку
-            ->paginate($perPage ?? 25); // За замовчуванням 25 статей на сторінку
+            ->orderBy('id', 'DESC')
+            ->with([
+                'category' => function ($query) {
+                    $query->select(['id', 'title']);
+                },
+                'user:id,name',
+            ])
+            ->paginate($perPage ?? 25);
 
         return $result;
     }
