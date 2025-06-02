@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RestTestController;
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
+use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,14 +29,21 @@ Route::group([
     Route::resource('posts', PostController::class)->names('blog.posts');
 });
 
+// Адмін-панель блогу
 $groupData = [
-    'namespace' => 'App\Http\Controllers\Blog\Admin',
+    // 'namespace' => 'App\Http\Controllers\Blog\Admin', // Цей рядок має бути закоментований або видалений
     'prefix' => 'admin/blog',
+    'as' => 'blog.admin.', // <--- ЦЕЙ ПРЕФІКС ДЛЯ ІМЕН МАРШРУТІВ
 ];
 Route::group($groupData, function () {
-    //BlogCategory
+    // BlogCategory
     $methods = ['index','edit','store','update','create',];
     Route::resource('categories', CategoryController::class)
         ->only($methods)
-        ->names('blog.admin.categories');
+        ->names('categories'); // <--- ЗМІНІТЬ ТУТ: ПРОСТО 'categories'
+
+    // BlogPost (Статті блогу для адмінки)
+    Route::resource('posts', AdminPostController::class)
+        ->except(['show'])
+        ->names('posts'); // <--- ЗМІНІТЬ ТУТ: ПРОСТО 'posts'
 });
