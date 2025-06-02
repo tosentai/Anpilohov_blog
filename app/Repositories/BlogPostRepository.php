@@ -39,20 +39,14 @@ class BlogPostRepository extends CoreRepository
             'published_at',
             'user_id',
             'category_id',
-            'created_at',
-            'updated_at',
         ];
 
-        $result = $this->startConditions()
+        $result = $this
+            ->startConditions()
             ->select($columns)
             ->orderBy('id', 'DESC')
-            ->with([
-                'category' => function ($query) {
-                    $query->select(['id', 'title']);
-                },
-                'user:id,name',
-            ])
-            ->paginate($perPage ?? 25);
+            ->with(['category', 'user']) // <-- Додано eager loading для категорії та користувача
+            ->paginate($perPage);
 
         return $result;
     }

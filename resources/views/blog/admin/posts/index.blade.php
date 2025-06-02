@@ -1,15 +1,20 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="container">
+    <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-12">
+                {{-- Включаємо шаблон для відображення повідомлень про успіх/помилки --}}
+                @include('blog.admin.posts.includes.result_messages')
+
                 <nav class="navbar navbar-toggleable-md navbar-light bg-faded mb-3">
-                    <a href="{{ route('blog.admin.posts.create') }}" class="btn btn-primary">Додати статтю</a>
+                    <a href="{{ route('blog.admin.posts.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i> Додати статтю
+                    </a>
                 </nav>
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-striped">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -23,7 +28,8 @@
                             <tbody>
                             @foreach ($paginator as $post)
                                 @php /** @var \App\Models\BlogPost $post */ @endphp
-                                <tr @if (!$post->is_published) style="background-color: #f8f9fa;" @endif>
+                                {{-- Якщо стаття не опублікована, виділяємо рядок світло-сірим за допомогою Bootstrap класу --}}
+                                <tr @if (!$post->is_published) class="table-secondary" @endif>
                                     <td>{{ $post->id }}</td>
                                     <td>{{ $post->user->name }}</td>
                                     <td>{{ $post->category->title }}</td>
@@ -35,10 +41,11 @@
                                         {{ $post->published_at ? \Carbon\Carbon::parse($post->published_at)->format('d.M H:i') : '' }}
                                     </td>
                                     <td>
-                                        {{-- Додайте тут кнопки для редагування/видалення --}}
-                                        <a href="{{ route('blog.admin.posts.edit', $post->id) }}" class="btn btn-sm btn-info">
+                                        {{-- Кнопка редагування --}}
+                                        <a href="{{ route('blog.admin.posts.edit', $post->id) }}" class="btn btn-sm btn-info me-1">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        {{-- Форма видалення --}}
                                         <form action="{{ route('blog.admin.posts.destroy', $post->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Ви впевнені, що хочете видалити цю статтю?')">
                                             @csrf
                                             @method('DELETE')
@@ -62,8 +69,8 @@
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body">
-                            {{ $paginator->links() }}
+                        <div class="card-body d-flex justify-content-center">
+                            {{ $paginator->links() }} {{-- Якщо пагінація виглядає не так як Bootstrap 4, можливо, потрібно: ->links('vendor.pagination.bootstrap-4') --}}
                         </div>
                     </div>
                 </div>

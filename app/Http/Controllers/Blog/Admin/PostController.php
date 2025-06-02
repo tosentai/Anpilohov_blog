@@ -2,101 +2,105 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Blog\Admin\BaseController;
 use App\Repositories\BlogPostRepository;
-use App\Repositories\BlogCategoryRepository; // Додайте цей рядок
-use App\Http\Requests\BlogPostUpdateRequest; // Додайте цей рядок
-use Illuminate\Support\Str; // Додайте цей рядок
+use App\Repositories\BlogCategoryRepository; // Обов'язково імпортуйте, якщо використовуєте
+use App\Http\Requests\BlogPostUpdateRequest;
+use App\Http\Requests\BlogPostCreateRequest; // <-- Додайте цей рядок
+use App\Models\BlogPost; // <-- Додайте цей рядок
 
-class PostController extends BaseController // Замініть Controller на BaseController
+class PostController extends BaseController
 {
     /**
      * @var BlogPostRepository
      */
     private $blogPostRepository;
-    private $blogCategoryRepository;
 
-    public function __construct()
-    {
-        parent::__construct(); // Викликаємо конструктор батьківського класу (BaseController)
+    /**
+     * @var BlogCategoryRepository
+     */
+    private $blogCategoryRepository; // Оголосіть властивість
 
-        // Ініціалізуємо репозиторій через контейнер сервісів Laravel.
-        // app() автоматично вирішить залежності.
-        $this->blogPostRepository = app(BlogPostRepository::class); // app() повертає об'єкт класу
-        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
-    }
-
+    /**
+     * Відобразити список ресурсів.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
-        // Отримуємо пагінований список статей за допомогою репозиторію
         $paginator = $this->blogPostRepository->getAllWithPaginate();
 
-        // Передаємо пагінатор у view
         return view('blog.admin.posts.index', compact('paginator'));
     }
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->blogPostRepository = app(BlogPostRepository::class);
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class); // Ініціалізуйте репозиторій
+    }
+
     /**
-     * Show the form for creating a new resource.
+     * Показати форму для створення нової статті.
+     *
+     * @return \Illuminate\View\View
      */
     public function create()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id) // Переконайтеся, що тип аргумента string
-    {
-        $item = $this->blogPostRepository->getEdit($id);
-        if (empty($item)) { // помилка, якщо репозиторій не знайде наш ID
-            abort(404);
-        }
+        $item = new BlogPost(); // Створюємо новий порожній об'єкт статті
         $categoryList = $this->blogCategoryRepository->getForComboBox(); // Отримуємо список категорій для випадаючого списку
 
         return view('blog.admin.posts.edit', compact('item', 'categoryList'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Зберегти нову статтю в базі даних.
+     *
+     * @param  BlogPostCreateRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(BlogPostUpdateRequest $request, string $id) // <-- Змінено тип Request
+    public function store(BlogPostCreateRequest $request) // <-- Змінено тип Request
     {
-        $item = $this->blogPostRepository->getEdit($id);
-        if (empty($item)) { // якщо ID не знайдено
-            return back() // redirect back
-            ->withErrors(['msg' => "Запис id=[{$id}] не знайдено"]) // видати помилку
-            ->withInput(); // повернути дані
-        }
-
         $data = $request->validated(); // Отримуємо валідовані дані
 
-        // Встановлюємо user_id, якщо він не встановлений (для нових статей)
-        // Для оновлення, user_id вже має бути встановлений, але можна додати перевірку
-        // if (empty($item->user_id)) {
-        //     $data['user_id'] = auth()->id(); // Або інший спосіб отримання ID користувача
-        // }
-        // Примітка: user_id вже має бути встановлений при створенні, або в міграціях,
-        // або в сідерах. Для оновлення він не змінюється.
+        // Логіка генерації slug, встановлення published_at та user_id перенесена в Observer
+        // Тут цих блоків коду НЕ МАЄ БУТИ (як ми робили в Лабораторній 9)
 
-        $result = $item->update($data); // оновлюємо дані об'єкта і зберігаємо в БД
+        $item = BlogPost::create($data); // Створюємо об'єкт і додаємо в БД
+
+        if ($item) {
+            return redirect()
+                ->route('blog.admin.posts.edit', [$item->id])
+                ->with(['success' => 'Успішно створено']);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Помилка створення'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Оновити існуючу статтю в базі даних.
+     *
+     * @param  BlogPostUpdateRequest  $request
+     * @param  string  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(BlogPostUpdateRequest $request, string $id)
+    {
+        $item = $this->blogPostRepository->getEdit($id);
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запис id=[{$id}] не знайдено"])
+                ->withInput();
+        }
+
+        $data = $request->validated();
+
+        // Логіка обробки slug та published_at перенесена в BlogPostObserver
+        // Тут цих блоків коду вже НЕ МАЄ БУТИ
+
+        $result = $item->update($data);
 
         if ($result) {
             return redirect()
@@ -110,10 +114,45 @@ class PostController extends BaseController // Замініть Controller на 
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Видалити статтю (м'яке видалення).
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(string $id)
     {
-        //
+        // Soft delete (м'яке видалення): запис залишається в базі даних, але позначається як видалений.
+        // Це дозволяє відновити запис пізніше.
+        $result = BlogPost::destroy($id);
+
+        // Для повного видалення з БД використовуйте:
+        // $result = BlogPost::find($id)->forceDelete();
+
+        if ($result) {
+            return redirect()
+                ->route('blog.admin.posts.index')
+                ->with(['success' => "Запис id[$id] видалено"]);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Помилка видалення']);
+        }
+    }
+
+    /**
+     * Показати форму для редагування статті.
+     *
+     * @param  string  $id
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function edit(string $id)
+    {
+        $item = $this->blogPostRepository->getEdit($id);
+        if (empty($item)) {
+            return back()->withErrors(['msg' => "Запис id=[{$id}] не знайдено"]);
+        }
+
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.posts.edit', compact('item', 'categoryList'));
     }
 }

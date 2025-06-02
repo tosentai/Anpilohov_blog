@@ -3,11 +3,25 @@
 namespace App\Observers;
 
 use App\Models\BlogPost;
-use Carbon\Carbon; // Додайте цей рядок
-use Illuminate\Support\Str; // Додайте цей рядок
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class BlogPostObserver
 {
+    /**
+     * Обробка події "creating" (перед створенням запису).
+     *
+     * @param  BlogPost  $blogPost
+     * @return void
+     */
+    public function creating(BlogPost $blogPost): void
+    {
+        $this->setPublishedAt($blogPost);
+        $this->setSlug($blogPost);
+        $this->setHtml($blogPost); // <-- Додайте цей рядок
+        $this->setUser($blogPost); // <-- Додайте цей рядок
+    }
+
     /**
      * Обробка події "updating" (перед оновленням запису).
      *
@@ -18,23 +32,7 @@ class BlogPostObserver
     {
         $this->setPublishedAt($blogPost);
         $this->setSlug($blogPost);
-    }
-
-    /**
-     * Обробка події "creating" (перед створенням запису).
-     *
-     * @param  BlogPost  $blogPost
-     * @return void
-     */
-    public function creating(BlogPost $blogPost): void
-    {
-        // Встановлюємо user_id при створенні, якщо він не встановлений
-        if (empty($blogPost->user_id)) {
-            $blogPost->user_id = auth()->id() ?? 1; // Використовуйте auth()->id() для авторизованого користувача, або 1 як дефолт
-        }
-
-        $this->setPublishedAt($blogPost);
-        $this->setSlug($blogPost);
+        $this->setHtml($blogPost); // <-- Додайте цей рядок
     }
 
     /**
@@ -66,5 +64,34 @@ class BlogPostObserver
         if (empty($blogPost->slug)) {
             $blogPost->slug = Str::slug($blogPost->title);
         }
+    }
+
+    /**
+     * Встановлюємо значення полю content_html з поля content_raw.
+     * (Тут можна було б додати перетворення Markdown в HTML).
+     *
+     * @param BlogPost $blogPost
+     * @return void
+     */
+    protected function setHtml(BlogPost $blogPost): void
+    {
+        if ($blogPost->isDirty('content_raw')) { // Перевіряємо, чи змінилося поле content_raw
+            // Тут можна було б додати логіку для перетворення Markdown в HTML, наприклад:
+            // $blogPost->content_html = Parsedown::instance()->text($blogPost->content_raw);
+            $blogPost->content_html = $blogPost->content_raw; // Наразі просто копіюємо
+        }
+    }
+
+    /**
+     * Якщо user_id не вказано, то встановимо юзера за замовчуванням (UNKNOWN_USER).
+     *
+     * @param BlogPost $blogPost
+     * @return void
+     */
+    protected function setUser(BlogPost $blogPost): void
+    {
+        // Встановлюємо user_id поточного авторизованого користувача,
+        // або UNKNOWN_USER, якщо користувач не авторизований.
+        $blogPost->user_id = auth()->id() ?? BlogPost::UNKNOWN_USER;
     }
 }

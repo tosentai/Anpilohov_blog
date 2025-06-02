@@ -10,6 +10,7 @@ class BlogCategory extends Model
 {
     use SoftDeletes;
     use HasFactory; // <-- Переконайтеся, що цей рядок є
+    const ROOT = 1;
 
     protected $fillable // Дозволені для масового призначення атрибути
         = [
@@ -27,17 +28,35 @@ class BlogCategory extends Model
      */
     public function parentCategory()
     {
-        return $this->belongsTo(BlogCategory::class, 'parent_id');
+        // Належить категорії (один-до-багатьох, зворотне)
+        // Вказуємо 'parent_id' як foreign key та 'id' як local key
+        return $this->belongsTo(BlogCategory::class, 'parent_id', 'id');
     }
 
     /**
      * Додаємо аксессор для отримання заголовка з відступом для дочірніх категорій
      * @return string
      */
-    public function getParentTitleAttribute()
+    public function getParentTitleAttribute(): string
     {
-        $parent = $this->parentCategory;
+        // Якщо батьківська категорія існує, повертаємо її назву.
+        // Якщо це коренева категорія (id === ROOT), повертаємо 'Корінь'.
+        // В іншому випадку (наприклад, parent_id вказує на неіснуючу категорію), повертаємо '???'.
+        $title = $this->parentCategory->title
+            ?? ($this->isRoot()
+                ? 'Корінь'
+                : '???');
 
-        return $parent ? $parent->title : 'Коренева';
+        return $title;
+    }
+
+    /**
+     * Перевірка, чи об'єкт є кореневим.
+     *
+     * @return bool
+     */
+    public function isRoot(): bool
+    {
+        return $this->id === BlogCategory::ROOT;
     }
 }

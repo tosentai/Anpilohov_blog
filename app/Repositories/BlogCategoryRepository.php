@@ -65,11 +65,12 @@ class BlogCategoryRepository extends CoreRepository
      */
     public function getAllWithPaginate(?int $perPage = null): LengthAwarePaginator
     {
-        $columns = ['id', 'title', 'parent_id', 'created_at', 'updated_at']; // Додаємо created_at, updated_at для відображення
+        $columns = ['id', 'title', 'parent_id', 'created_at', 'updated_at'];
 
         $result = $this
             ->startConditions()
             ->select($columns)
+            ->with(['parentCategory:id,title']) // <-- Додаємо eager loading для батьківської категорії
             ->paginate($perPage);
 
         return $result;
