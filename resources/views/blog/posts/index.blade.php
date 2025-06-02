@@ -1,15 +1,15 @@
-@extends('layouts.main') {{-- Вказуємо, що цей шаблон розширює layouts.main --}}
+@extends('layouts.main')
 
-@section('content') {{-- Позначаємо секцію, яка буде вставлена в @yield('content') --}}
-<div class="container mt-4"> {{-- Додаємо контейнер для центрування та відступів --}}
+@section('content')
+<div class="container mt-4">
     <div class="row">
-        <div class="col-md-12"> {{-- Використовуємо одну повну колонку для обох елементів --}}
+        <div class="col-md-12">
             <h1 class="mb-3">Список постів блогу</h1>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12"> {{-- Таблиця тепер у своїй власній повній колонці --}}
-            <table class="table table-bordered table-hover"> {{-- Додаємо Bootstrap класи для таблиці --}}
+        <div class="col-md-12">
+            <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>ID</th>

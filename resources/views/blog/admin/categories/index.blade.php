@@ -5,19 +5,17 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="card">
-                    {{-- Заголовок картки з кнопкою "Додати" --}}
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="mb-0" style="margin-right: 16px">Список категорій блогу</h3>
                         <a href="{{ route('blog.admin.categories.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus-circle me-2"></i>Додати категорію
                         </a>
                     </div>
-                    {{-- Тіло картки з таблицею --}}
                     <div class="card-body">
                         @if($paginator->isEmpty())
                             <p class="text-center">Категорій поки немає.</p>
                         @else
-                            <table class="table table-hover table-striped"> {{-- Додано table-striped для чергування кольорів рядків --}}
+                            <table class="table table-hover table-striped">
                                 <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -34,7 +32,7 @@
                                                 {{ $item->title }}
                                             </a>
                                         </td>
-                                        <td @if(in_array($item->parent_id, [0, 1])) class="text-muted" @endif> {{-- Використовуємо Bootstrap клас для сірого кольору --}}
+                                        <td @if(in_array($item->parent_id, [0, 1])) class="text-muted" @endif>
                                             {{ $item->parent_title  }}
                                         </td>
                                     </tr>
@@ -47,12 +45,11 @@
             </div>
         </div>
 
-        {{-- Пагінація --}}
         @if($paginator->total() > $paginator->count())
             <div class="row justify-content-center mt-3">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-body d-flex justify-content-center"> {{-- Центруємо пагінацію --}}
+                        <div class="card-body d-flex justify-content-center">
                             {{ $paginator->links() }}
                         </div>
                     </div>
