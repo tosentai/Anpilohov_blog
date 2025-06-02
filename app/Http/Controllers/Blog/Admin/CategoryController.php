@@ -8,16 +8,27 @@ use App\Models\BlogCategory;
 use Illuminate\Support\Str;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
+use App\Repositories\BlogCategoryRepository;
 
 class CategoryController extends BaseController
 {
     /**
-     * Display a listing of the resource.
+     * @var BlogCategoryRepository
      */
+    private $blogCategoryRepository;
+
+    public function __construct()
+    {
+        parent::__construct(); // Викликаємо конструктор батьківського класу (BaseController)
+
+        // Ініціалізуємо репозиторій через контейнер сервісів Laravel.
+        // app() автоматично вирішить залежності.
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
+    }
     public function index()
     {
-//        dd(__METHOD__);
-        $paginator = BlogCategory::paginate(5); // Отримуємо категорії з пагінацією по 5 записів
+        // $paginator = BlogCategory::paginate(5); // <-- Закоментуйте цей рядок
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5); // <-- Додайте цей рядок
 
         return view('blog.admin.categories.index', compact('paginator'));
     }
@@ -28,7 +39,8 @@ class CategoryController extends BaseController
     public function create()
     {
         $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        // $categoryList = BlogCategory::all(); // <-- Закоментуйте цей рядок
+        $categoryList = $this->blogCategoryRepository->getForComboBox(); // <-- Додайте цей рядок
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -67,10 +79,16 @@ class CategoryController extends BaseController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id) // Переконайтеся, що тип аргумента string або int
+    public function edit(string $id)
     {
-        $item = BlogCategory::findOrFail($id); // Знаходимо категорію за ID, або кидаємо 404
-        $categoryList = BlogCategory::all();   // Отримуємо всі категорії для списку батьківських
+        $item = $this->blogCategoryRepository->getEdit($id); // <-- Використовуємо репозиторій
+        if (empty($item)) {
+            abort(404); // Якщо репозиторій не знайде наш ID, кидаємо 404
+        }
+        $categoryList = $this->blogCategoryRepository->getForComboBox(); // <-- Використовуємо репозиторій
+        // Примітка: $item->parent_id не потрібен для getForComboBox, якщо він просто повертає всі категорії.
+        // Якщо getForComboBox має логіку виключення поточної категорії або її дочірніх,
+        // то $item->id може бути переданий. Але за поточним завданням - не потрібен.
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -80,19 +98,21 @@ class CategoryController extends BaseController
      */
     public function update(BlogCategoryUpdateRequest $request, string $id)
     {
-        $item = BlogCategory::find($id); // Знаходимо категорію за ID
-        if (empty($item)) { // якщо ID не знайдено
-            return back() // redirect back
-            ->withErrors(['msg' => "Запис id=[{$id}] не знайдено"]) // видати помилку
-            ->withInput(); // повернути дані
+        // $item = BlogCategory::find($id); // <-- Замініть цей рядок
+        $item = $this->blogCategoryRepository->getEdit($id); // <-- На цей рядок
+
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запис id=[{$id}] не знайдено"])
+                ->withInput();
         }
 
-        $data = $request->all(); // отримуємо масив даних, які надійшли з форми
-        if (empty($data['slug'])) { // якщо псевдонім порожній
-            $data['slug'] = Str::slug($data['title']); // генеруємо псевдонім
+        $data = $request->validated(); // Отримуємо валідовані дані
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']);
         }
 
-        $result = $item->update($data); // оновлюємо дані об'єкта і зберігаємо в БД
+        $result = $item->update($data);
 
         if ($result) {
             return redirect()
@@ -100,7 +120,7 @@ class CategoryController extends BaseController
                 ->with(['success' => 'Успішно збережено']);
         } else {
             return back()
-                ->withErrors(['msg' => 'Помилка збереження']) // Помилка, тут має бути withErrors
+                ->withErrors(['msg' => 'Помилка збереження'])
                 ->withInput();
         }
     }
