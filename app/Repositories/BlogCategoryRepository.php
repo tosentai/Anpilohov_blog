@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Models\BlogCategory as Model; // Використовуємо аліас Model для App\Models\BlogCategory
+use App\Models\BlogCategory as Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator; // Для підказки типів пагінатора
-use Illuminate\Support\Facades\DB; // Для DB::raw у getForComboBox
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class BlogCategoryRepository.
@@ -21,7 +21,6 @@ class BlogCategoryRepository extends CoreRepository
      */
     protected function getModelClass(): string
     {
-        // Абстрагування моделі BlogCategory, для легшого створення іншого репозиторія
         return Model::class;
     }
 
@@ -41,7 +40,7 @@ class BlogCategoryRepository extends CoreRepository
      *
      * @return Collection
      */
-    public function getForComboBox(): Collection // Цей тип повернення вимагає Eloquent Collection
+    public function getForComboBox(): Collection
     {
         $columns = implode(', ', [
             'id',
@@ -51,7 +50,6 @@ class BlogCategoryRepository extends CoreRepository
         $result = $this
             ->startConditions()
             ->selectRaw($columns)
-            // ->toBase() // <--- ВИДАЛІТЬ ЦЕЙ РЯДОК!
             ->get();
 
         return $result;
@@ -70,7 +68,7 @@ class BlogCategoryRepository extends CoreRepository
         $result = $this
             ->startConditions()
             ->select($columns)
-            ->with(['parentCategory:id,title']) // <-- Додаємо eager loading для батьківської категорії
+            ->with(['parentCategory:id,title'])
             ->paginate($perPage);
 
         return $result;

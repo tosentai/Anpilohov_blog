@@ -19,16 +19,13 @@ class CategoryController extends BaseController
 
     public function __construct()
     {
-        parent::__construct(); // Викликаємо конструктор батьківського класу (BaseController)
+        parent::__construct();
 
-        // Ініціалізуємо репозиторій через контейнер сервісів Laravel.
-        // app() автоматично вирішить залежності.
         $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
     public function index()
     {
-        // $paginator = BlogCategory::paginate(5); // <-- Закоментуйте цей рядок
-        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5); // <-- Додайте цей рядок
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
 
         return view('blog.admin.categories.index', compact('paginator'));
     }
@@ -39,8 +36,7 @@ class CategoryController extends BaseController
     public function create()
     {
         $item = new BlogCategory();
-        // $categoryList = BlogCategory::all(); // <-- Закоментуйте цей рядок
-        $categoryList = $this->blogCategoryRepository->getForComboBox(); // <-- Додайте цей рядок
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -78,14 +74,12 @@ class CategoryController extends BaseController
      */
     public function edit(string $id)
     {
-        $item = $this->blogCategoryRepository->getEdit($id); // <-- Використовуємо репозиторій
+        $item = $this->blogCategoryRepository->getEdit($id);
         if (empty($item)) {
-            abort(404); // Якщо репозиторій не знайде наш ID, кидаємо 404
+            abort(404);
         }
-        $categoryList = $this->blogCategoryRepository->getForComboBox(); // <-- Використовуємо репозиторій
-        // Примітка: $item->parent_id не потрібен для getForComboBox, якщо він просто повертає всі категорії.
-        // Якщо getForComboBox має логіку виключення поточної категорії або її дочірніх,
-        // то $item->id може бути переданий. Але за поточним завданням - не потрібен.
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -95,8 +89,7 @@ class CategoryController extends BaseController
      */
     public function update(BlogCategoryUpdateRequest $request, string $id)
     {
-        // $item = BlogCategory::find($id); // <-- Замініть цей рядок
-        $item = $this->blogCategoryRepository->getEdit($id); // <-- На цей рядок
+        $item = $this->blogCategoryRepository->getEdit($id);
 
         if (empty($item)) {
             return back()
@@ -104,7 +97,7 @@ class CategoryController extends BaseController
                 ->withInput();
         }
 
-        $data = $request->validated(); // Отримуємо валідовані дані
+        $data = $request->validated();
 
         $result = $item->update($data);
 

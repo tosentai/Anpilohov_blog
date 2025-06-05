@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application; // Додаємо цей use для коректної підказки типів
+use Illuminate\Foundation\Application;
 
 /**
  * Class CoreRepository.
@@ -22,9 +22,6 @@ abstract class CoreRepository
     /** CoreRepository constructor */
     public function __construct()
     {
-        // app() - це помічник Laravel, який вирішує залежності з контейнера сервісів.
-        // Ми передаємо йому назву класу моделі, яку повертає getModelClass().
-        // Таким чином, $this->model буде екземпляром конкретної моделі (наприклад, BlogCategory).
         $this->model = app($this->getModelClass());
     }
 
@@ -33,7 +30,7 @@ abstract class CoreRepository
      *
      * @return string
      */
-    abstract protected function getModelClass(): string; // Вказуємо тип повернення string
+    abstract protected function getModelClass(): string;
 
     /**
      * Отримати "свіжий" екземпляр моделі для початку ланцюжка запитів.
@@ -42,9 +39,6 @@ abstract class CoreRepository
      */
     protected function startConditions()
     {
-        // clone $this->model створює новий екземпляр моделі,
-        // щоб уникнути модифікації оригінального об'єкта $this->model
-        // при побудові запитів.
         return clone $this->model;
     }
 }

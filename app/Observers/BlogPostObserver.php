@@ -18,8 +18,8 @@ class BlogPostObserver
     {
         $this->setPublishedAt($blogPost);
         $this->setSlug($blogPost);
-        $this->setHtml($blogPost); // <-- Додайте цей рядок
-        $this->setUser($blogPost); // <-- Додайте цей рядок
+        $this->setHtml($blogPost);
+        $this->setUser($blogPost);
     }
 
     /**
@@ -32,7 +32,7 @@ class BlogPostObserver
     {
         $this->setPublishedAt($blogPost);
         $this->setSlug($blogPost);
-        $this->setHtml($blogPost); // <-- Додайте цей рядок
+        $this->setHtml($blogPost);
     }
 
     /**
@@ -47,7 +47,7 @@ class BlogPostObserver
     {
         if (empty($blogPost->published_at) && $blogPost->is_published) {
             $blogPost->published_at = Carbon::now();
-        } elseif (!$blogPost->is_published) { // Якщо знімаємо публікацію
+        } elseif (!$blogPost->is_published) {
             $blogPost->published_at = null;
         }
     }
@@ -75,10 +75,8 @@ class BlogPostObserver
      */
     protected function setHtml(BlogPost $blogPost): void
     {
-        if ($blogPost->isDirty('content_raw')) { // Перевіряємо, чи змінилося поле content_raw
-            // Тут можна було б додати логіку для перетворення Markdown в HTML, наприклад:
-            // $blogPost->content_html = Parsedown::instance()->text($blogPost->content_raw);
-            $blogPost->content_html = $blogPost->content_raw; // Наразі просто копіюємо
+        if ($blogPost->isDirty('content_raw')) {
+            $blogPost->content_html = $blogPost->content_raw;
         }
     }
 
@@ -90,8 +88,6 @@ class BlogPostObserver
      */
     protected function setUser(BlogPost $blogPost): void
     {
-        // Встановлюємо user_id поточного авторизованого користувача,
-        // або UNKNOWN_USER, якщо користувач не авторизований.
         $blogPost->user_id = auth()->id() ?? BlogPost::UNKNOWN_USER;
     }
 }

@@ -28,10 +28,10 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8000/admin/blog/posts">Пости</a>
+                <a class="nav-link" href="/admin/blog/posts">Пости</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8000/admin/blog/categories/">Категорії</a>
+                <a class="nav-link" href="/admin/blog/categories/">Категорії</a>
             </li>
         </ul>
 

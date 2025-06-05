@@ -11,7 +11,6 @@ abstract class BaseController extends GuestBaseController
      */
     public function __construct()
     {
-        // Ініціалізація загальних елементів адмінки
-        // Тут можна додати, наприклад, перевірку авторизації для адмін-панелі
+
     }
 }

@@ -24,10 +24,10 @@ class BlogPostUpdateRequest extends FormRequest
         return [
             'title' => 'required|min:5|max:200',
             'slug' => 'max:200',
-            'excerpt' => 'max:500|nullable', // Додано nullable
+            'excerpt' => 'max:500|nullable',
             'content_raw' => 'required|string|min:5|max:10000',
             'category_id' => 'required|integer|exists:blog_categories,id',
-            'is_published' => 'boolean', // Додано правило для checkbox
+            'is_published' => 'boolean',
         ];
     }
 }

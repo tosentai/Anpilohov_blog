@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Models\BlogPost as Model; // Використовуємо аліас Model для App\Models\BlogPost
-use Illuminate\Database\Eloquent\Collection; // Можливо, не знадобиться, але лишимо для прикладу
-use Illuminate\Contracts\Pagination\LengthAwarePaginator; // Для підказки типів пагінатора
+use App\Models\BlogPost as Model;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Class BlogPostRepository.
@@ -45,7 +45,7 @@ class BlogPostRepository extends CoreRepository
             ->startConditions()
             ->select($columns)
             ->orderBy('id', 'DESC')
-            ->with(['category', 'user']) // <-- Додано eager loading для категорії та користувача
+            ->with(['category', 'user'])
             ->paginate($perPage);
 
         return $result;

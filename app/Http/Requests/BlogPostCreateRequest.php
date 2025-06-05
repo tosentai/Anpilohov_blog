@@ -13,7 +13,7 @@ class BlogPostCreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Для лабораторної роботи дозволяємо всім
+        return true;
     }
 
     /**
@@ -24,12 +24,12 @@ class BlogPostCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|min:5|max:200|unique:blog_posts', // Унікальний заголовок
-            'slug' => 'max:200|unique:blog_posts', // Унікальний slug
+            'title' => 'required|min:5|max:200|unique:blog_posts',
+            'slug' => 'max:200|unique:blog_posts',
             'content_raw' => 'required|string|min:5|max:10000',
             'category_id' => 'required|integer|exists:blog_categories,id',
-            'excerpt' => 'max:500|nullable', // Додано nullable
-            'is_published' => 'boolean', // Додано правило для checkbox
+            'excerpt' => 'max:500|nullable',
+            'is_published' => 'boolean',
         ];
     }
 

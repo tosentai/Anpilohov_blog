@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Blog;
 
 use Illuminate\Http\Request;
-use App\Models\BlogPost; // Додаємо цей рядок
+use App\Models\BlogPost;
 use App\Http\Controllers\Controller;
 
 class PostController extends BaseController
@@ -13,9 +13,9 @@ class PostController extends BaseController
      */
     public function index()
     {
-        $items = BlogPost::all(); // Обов'язково має бути
+        $items = BlogPost::all();
 
-        return view('blog.posts.index', compact('items')); // Обов'язково має бути
+        return view('blog.posts.index', compact('items'));
     }
 
     /**

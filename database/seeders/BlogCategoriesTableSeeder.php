@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str; // Додаємо для Str::slug
-use Illuminate\Support\Facades\DB; // Додаємо для DB::table
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class BlogCategoriesTableSeeder extends Seeder
 {
@@ -19,12 +19,12 @@ class BlogCategoriesTableSeeder extends Seeder
         $categories[] = [
             'title'     => $cName,
             'slug'      => Str::slug($cName),
-            'parent_id' => 0, // Змінив на 0, оскільки 1 вже може бути зайнято
+            'parent_id' => 0,
         ];
 
         for ($i = 1; $i <=10; $i++) {
             $cName = 'Категорія #' . $i;
-            $parentId = ($i > 4) ? rand(1, 4) : 1; // Тут варто врахувати, що parent_id=0 не може бути, тому 1 - це "Без категорії"
+            $parentId = ($i > 4) ? rand(1, 4) : 1;
 
             $categories[] = [
                 'title'     => $cName,

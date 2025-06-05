@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Blog\Admin\BaseController;
 use App\Repositories\BlogPostRepository;
-use App\Repositories\BlogCategoryRepository; // Обов'язково імпортуйте, якщо використовуєте
+use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
-use App\Http\Requests\BlogPostCreateRequest; // <-- Додайте цей рядок
-use App\Models\BlogPost; // <-- Додайте цей рядок
+use App\Http\Requests\BlogPostCreateRequest;
+use App\Models\BlogPost;
 
 class PostController extends BaseController
 {
@@ -19,7 +19,7 @@ class PostController extends BaseController
     /**
      * @var BlogCategoryRepository
      */
-    private $blogCategoryRepository; // Оголосіть властивість
+    private $blogCategoryRepository;
 
     /**
      * Відобразити список ресурсів.
@@ -37,7 +37,7 @@ class PostController extends BaseController
     {
         parent::__construct();
         $this->blogPostRepository = app(BlogPostRepository::class);
-        $this->blogCategoryRepository = app(BlogCategoryRepository::class); // Ініціалізуйте репозиторій
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
 
     /**
@@ -47,8 +47,8 @@ class PostController extends BaseController
      */
     public function create()
     {
-        $item = new BlogPost(); // Створюємо новий порожній об'єкт статті
-        $categoryList = $this->blogCategoryRepository->getForComboBox(); // Отримуємо список категорій для випадаючого списку
+        $item = new BlogPost();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.posts.edit', compact('item', 'categoryList'));
     }
@@ -59,14 +59,11 @@ class PostController extends BaseController
      * @param  BlogPostCreateRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(BlogPostCreateRequest $request) // <-- Змінено тип Request
+    public function store(BlogPostCreateRequest $request)
     {
-        $data = $request->validated(); // Отримуємо валідовані дані
+        $data = $request->validated();
 
-        // Логіка генерації slug, встановлення published_at та user_id перенесена в Observer
-        // Тут цих блоків коду НЕ МАЄ БУТИ (як ми робили в Лабораторній 9)
-
-        $item = BlogPost::create($data); // Створюємо об'єкт і додаємо в БД
+        $item = BlogPost::create($data);
 
         if ($item) {
             return redirect()
@@ -97,9 +94,6 @@ class PostController extends BaseController
 
         $data = $request->validated();
 
-        // Логіка обробки slug та published_at перенесена в BlogPostObserver
-        // Тут цих блоків коду вже НЕ МАЄ БУТИ
-
         $result = $item->update($data);
 
         if ($result) {
@@ -121,12 +115,7 @@ class PostController extends BaseController
      */
     public function destroy(string $id)
     {
-        // Soft delete (м'яке видалення): запис залишається в базі даних, але позначається як видалений.
-        // Це дозволяє відновити запис пізніше.
         $result = BlogPost::destroy($id);
-
-        // Для повного видалення з БД використовуйте:
-        // $result = BlogPost::find($id)->forceDelete();
 
         if ($result) {
             return redirect()
