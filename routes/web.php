@@ -6,7 +6,7 @@ use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Blog\Admin\MainController as AdminMainController;
-
+use App\Http\Controllers\DiggingDeeperController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,4 +44,9 @@ Route::group($groupData, function () {
     Route::resource('posts', AdminPostController::class)
         ->except(['show'])
         ->names('posts');
+});
+
+Route::group(['prefix' => 'digging_deeper'], function () {
+    Route::get('collections', [DiggingDeeperController::class, 'collections'])
+        ->name('digging_deeper.collections');
 });
